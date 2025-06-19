@@ -1,19 +1,65 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# azure-pipelines.yml
+# Reusable public CI/CD pipeline for open-source projects
 
 trigger:
-- main
+  branches:
+    include:
+      - main
+      - master
+      - develop
 
-pool:
-  vmImage: ubuntu-latest
+pr:
+  branches:
+    include:
+      - '*'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  buildConfiguration: 'Release'
+  vmImageName: 'ubuntu-latest'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+
+- stage: Build
+  displayName: 'Build Stage'
+  jobs:
+  - job: BuildJob
+    displayName: 'Build Job'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+    - script: echo "Building the project..."
+      displayName: 'Run Build Script'
+    - script: echo "Add your build steps here (e.g., dotnet build, npm install, etc.)"
+      displayName: 'Example Build Command'
+
+- stage: Test
+  displayName: 'Test Stage'
+  dependsOn: Build
+  jobs:
+  - job: TestJob
+    displayName: 'Test Job'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+    - script: echo "Running unit tests..."
+      displayName: 'Run Tests'
+    - script: echo "Add your test commands here (e.g., dotnet test, npm test, etc.)"
+      displayName: 'Example Test Command'
+
+- stage: Deploy
+  displayName: 'Deploy Stage'
+  dependsOn: Test
+  condition: succeeded()
+  jobs:
+  - job: DeployJob
+    displayName: 'Deploy Job'
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - checkout: self
+    - script: echo "Deploying the project..."
+      displayName: 'Deploy Placeholder'
+    - script: echo "Add deployment steps here (e.g., Azure CLI deploy, ARM template deployment)"
+      displayName: 'Example Deployment Command'
